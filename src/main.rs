@@ -1,6 +1,5 @@
 use std::env;
-use std::process::exit;
-use std::io::{self, Read};
+use std::io;
 
 use serenity::async_trait;
 use serenity::model::channel::Message;
@@ -42,7 +41,26 @@ impl EventHandler for Handler {
         if msg.guild_id == None {
             // make the discriminator with 4 digits
             let discriminator = string_discriminator(msg.author.discriminator);
-            println!("{}#{} wrote: {}", msg.author.name, discriminator, msg.content);
+
+            let mut content = msg.content.clone();
+            content = content.replace(":wave:", "👋");
+
+            println!("{}#{} wrote: {}", msg.author.name, discriminator, content.green());
+
+            // ignore all bots
+            if !msg.author.bot {
+                /*if let Err(why) = msg.channel_id.say(&ctx.http, ".").await {
+                    println!("Error sending message: {:?}", why);
+                }*/
+
+                if msg.content == "hey" {
+                    if let Err(why) = msg.channel_id.say(&ctx.http, "hey :wave:").await {
+                        println!("Error sending message: {:?}", why);
+                    } 
+                }
+
+            }
+            
         } else {
             println!("A message on a guild was received ...");
         }
